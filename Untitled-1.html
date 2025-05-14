@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f5f5f5;
+            transition: all 0.3s ease;
+        }
+        
+        .calculator {
+            background-color: #333;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            width: 320px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .display {
+            background-color: #222;
+            color: white;
+            text-align: right;
+            padding: 20px;
+            height: 100px;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            transition: all 0.3s ease;
+        }
+        
+        .operation-display {
+            font-size: 18px;
+            color: #aaa;
+            height: 20px;
+            margin-bottom: 8px;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        
+        .current-input {
+            font-size: 36px;
+            max-width: 280px;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        
+        .history-panel {
+            background-color: #2a2a2a;
+            max-height: 200px;
+            overflow-y: auto;
+            color: #ddd;
+            font-size: 16px;
+            border-bottom: 1px solid #444;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .history-item {
+            padding: 10px 20px;
+            text-align: right;
+            border-bottom: 1px solid #3a3a3a;
+        }
+        
+        .history-operation {
+            color: #999;
+            font-size: 14px;
+        }
+        
+        .history-result {
+            color: white;
+            font-weight: bold;
+        }
+        
+        .clear-history {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            background-color: #555;
+            color: #ddd;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .clear-history:hover {
+            background-color: #777;
+        }
+        
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            background-color: #444;
+            transition: all 0.3s ease;
+        }
+        
+        button {
+            border: none;
+            font-size: 24px;
+            height: 70px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background-color: #555;
+            color: white;
+        }
+        
+        button:hover {
+            background-color: #666;
+        }
+        
+        button:active {
+            background-color: #777;
+            transform: scale(0.95);
+        }
+        
+        .operator {
+            background-color: #ff9500;
+        }
+        
+        .operator:hover {
+            background-color: #ffaa33;
+        }
+        
+        .equals {
+            background-color: #ff9500;
+        }
+        
+        .clear, .backspace {
+            background-color: #a5a5a5;
+            color: #333;
+        }
+        
+        .clear:hover, .backspace:hover {
+            background-color: #bbb;
+        }
+        
+        .zero {
+            grid-column: span 2;
+        }
+        
+        .theme-selector {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            padding: 5px 0;
+            background-color: #444;
+            transition: all 0.3s ease;
+        }
+        
+        .theme-btn {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .theme-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .theme-btn.active {
+            border-color: white;
+        }
+        
+        .theme-dark {
+            background-color: #333;
+        }
+        
+        .theme-light {
+            background-color: #f0f0f0;
+        }
+        
+        .theme-blue {
+            background-color: #1a5276;
+        }
+        
+        .theme-green {
+            background-color: #196f3d;
+        }
+        
+        /* Light Theme */
+        body.light-theme {
+            background-color: #f0f0f0;
+        }
+        
+        .light-theme .calculator {
+            background-color: #e0e0e0;
+        }
+        
+        .light-theme .display {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+        
+        .light-theme .operation-display {
+            color: #777;
+        }
+        
+        .light-theme .history-panel {
+            background-color: #d8d8d8;
+            border-bottom: 1px solid #ccc;
+        }
+        
+        .light-theme .history-item {
+            border-bottom: 1px solid #ccc;
+        }
+        
+        .light-theme .history-operation {
+            color: #666;
+        }
+        
+        .light-theme .history-result {
+            color: #333;
+        }
+        
+        .light-theme .clear-history {
+            background-color: #ccc;
+            color: #333;
+        }
+        
+        .light-theme .clear-history:hover {
+            background-color: #bbb;
+        }
+        
+        .light-theme .buttons {
+            background-color: #ccc;
+        }
+        
+        .light-theme button {
+            background-color: #e0e0e0;
+            color: #333;
+        }
+        
+        .light-theme button:hover {
+            background-color: #d0d0d0;
+        }
+        
+        .light-theme .operator {
+            background-color: #ff9500;
+            color: white;
+        }
+        
+        .light-theme .equals {
+            background-color: #ff9500;
+            color: white;
+        }
+        
+        .light-theme .clear, .light-theme .backspace {
+            background-color: #ccc;
+            color: #333;
+        }
+        
+        .light-theme .theme-selector {
+            background-color: #ccc;
+        }
+        
+        /* Blue Theme */
+        body.blue-theme {
+            background-color: #d4e6f5;
+        }
+        
+        .blue-theme .calculator {
+            background-color: #1a5276;
+        }
+        
+        .blue-theme .display {
+            background-color: #2471a3;
+        }
+        
+        .blue-theme .history-panel {
+            background-color: #2874a6;
+        }
+        
+        .blue-theme .buttons {
+            background-color: #2e86c1;
+        }
+        
+        .blue-theme button {
+            background-color: #3498db;
+        }
+        
+        .blue-theme button:hover {
+            background-color: #5dade2;
+        }
+        
+        .blue-theme .operator {
+            background-color: #1a5276;
+        }
+        
+        .blue-theme .operator:hover {
+            background-color: #21618c;
+        }
+        
+        .blue-theme .equals {
+            background-color: #1a5276;
+        }
+        
+        .blue-theme .clear, .blue-theme .backspace {
+            background-color: #5dade2;
+        }
+        
+        .blue-theme .theme-selector {
+            background-color: #2874a6;
+        }
+        
+        /* Green Theme */
+        body.green-theme {
+            background-color: #d4f5e2;
+        }
+        
+        .green-theme .calculator {
+            background-color: #196f3d;
+        }
+        
+        .green-theme .display {
+            background-color: #239b56;
+        }
+        
+        .green-theme .history-panel {
+            background-color: #27ae60;
+        }
+        
+        .green-theme .buttons {
+            background-color: #2ecc71;
+        }
+        
+        .green-theme button {
+            background-color: #58d68d;
+        }
+        
+        .green-theme button:hover {
+            background-color: #7dcea0;
+        }
+        
+        .green-theme .operator {
+            background-color: #196f3d;
+        }
+        
+        .green-theme .operator:hover {
+            background-color: #1e8449;
+        }
+        
+        .green-theme .equals {
+            background-color: #196f3d;
+        }
+        
+        .green-theme .clear, .green-theme .backspace {
+            background-color: #7dcea0;
+            color: #196f3d;
+        }
+        
+        .green-theme .theme-selector {
+            background-color: #27ae60;
+        }
+
+        .error {
+            color: #ff5555;
+            font-size: 16px;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="history-panel" id="history">
+            <button class="clear-history" id="clearHistory">Clear History</button>
+            <!-- History items will be added here -->
+        </div>
+        <div class="display">
+            <div class="operation-display" id="operation">0</div>
+            <div class="current-input" id="current-input">0</div>
+            <div class="error" id="error-message"></div>
+        </div>
+        <div class="buttons">
+            <button class="clear">AC</button>
+            <button class="backspace">⌫</button>
+            <button class="operator">%</button>
+            <button class="operator">÷</button>
+            
+            <button class="number">7</button>
+            <button class="number">8</button>
+            <button class="number">9</button>
+            <button class="operator">×</button>
+            
+            <button class="number">4</button>
+            <button class="number">5</button>
+            <button class="number">6</button>
+            <button class="operator">-</button>
+            
+            <button class="number">1</button>
+            <button class="number">2</button>
+            <button class="number">3</button>
+            <button class="operator">+</button>
+            
+            <button class="number zero">0</button>
+            <button class="decimal">.</button>
+            <button class="equals">=</button>
+        </div>
+        <div class="theme-selector">
+            <div class="theme-btn theme-dark active" data-theme="dark"></div>
+            <div class="theme-btn theme-light" data-theme="light"></div>
+            <div class="theme-btn theme-blue" data-theme="blue"></div>
+            <div class="theme-btn theme-green" data-theme="green"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const display = document.getElementById('current-input');
+            const operationDisplay = document.getElementById('operation');
+            const errorMessage = document.getElementById('error-message');
+            const historyPanel = document.getElementById('history');
+            const clearHistoryBtn = document.getElementById('clearHistory');
+            const buttons = document.querySelectorAll('button');
+            const themeButtons = document.querySelectorAll('.theme-btn');
+            
+            let currentInput = '0';
+            let pendingOperation = null;
+            let firstOperand = null;
+            let resetInput = false;
+            let operationString = '';
+            
+            // Load saved history from localStorage
+            loadHistory();
+            
+            // Load saved theme from localStorage
+            loadTheme();
+            
+            // Update the display
+            function updateDisplay() {
+                display.textContent = currentInput;
+            }
+            
+            // Update the operation display
+            function updateOperationDisplay() {
+                operationDisplay.textContent = operationString;
+            }
+            
+            // Display error message
+            function showError(message) {
+                errorMessage.textContent = message;
+                setTimeout(() => {
+                    errorMessage.textContent = '';
+                }, 3000);
+            }
+            
+            // Save history to localStorage
+            function saveHistory() {
+                const historyItems = Array.from(historyPanel.querySelectorAll('.history-item')).map(item => {
+                    return {
+                        operation: item.querySelector('.history-operation').textContent,
+                        result: item.querySelector('.history-result').textContent
+                    };
+                });
+                
+                localStorage.setItem('calculatorHistory', JSON.stringify(historyItems));
+            }
+            
+            // Load history from localStorage
+            function loadHistory() {
+                const savedHistory = localStorage.getItem('calculatorHistory');
+                
+                if (savedHistory) {
+                    const historyItems = JSON.parse(savedHistory);
+                    
+                    historyItems.forEach(item => {
+                        const historyItem = document.createElement('div');
+                        historyItem.className = 'history-item';
+                        
+                        const historyOperation = document.createElement('div');
+                        historyOperation.className = 'history-operation';
+                        historyOperation.textContent = item.operation;
+                        
+                        const historyResult = document.createElement('div');
+                        historyResult.className = 'history-result';
+                        historyResult.textContent = item.result;
+                        
+                        historyItem.appendChild(historyOperation);
+                        historyItem.appendChild(historyResult);
+                        historyPanel.appendChild(historyItem);
+                    });
+                }
+            }
+            
+            // Add entry to history
+            function addToHistory(operation, result) {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                
+                const historyOperation = document.createElement('div');
+                historyOperation.className = 'history-operation';
+                historyOperation.textContent = operation;
+                
+                const historyResult = document.createElement('div');
+                historyResult.className = 'history-result';
+                historyResult.textContent = result;
+                
+                historyItem.appendChild(historyOperation);
+                historyItem.appendChild(historyResult);
+                historyPanel.appendChild(historyItem);
+                
+                // Scroll to bottom of history panel
+                historyPanel.scrollTop = historyPanel.scrollHeight;
+                
+                // Save history to localStorage
+                saveHistory();
+                
+                // Make history panel visible if it's the first entry
+                historyPanel.style.display = 'block';
+            }
+            
+            // Clear history
+            function clearHistory() {
+                // Remove all history items but keep the clear history button
+                while (historyPanel.children.length > 1) {
+                    historyPanel.removeChild(historyPanel.lastChild);
+                }
+                
+                // Clear history in localStorage
+                localStorage.removeItem('calculatorHistory');
+                
+                // Hide history panel when empty
+                if (historyPanel.children.length <= 1) {
+                    historyPanel.style.display = 'none';
+                }
+            }
+            
+            // Handle number button clicks
+            function inputNumber(number) {
+                // Prevent extremely long inputs (max 12 digits)
+                if (currentInput.replace(/[^\d]/g, '').length >= 12 && !resetInput) {
+                    return;
+                }
+                
+                if (currentInput === '0' || resetInput) {
+                    currentInput = number;
+                    resetInput = false;
+                } else {
+                    currentInput += number;
+                }
+                updateDisplay();
+            }
+            
+            // Handle decimal point
+            function inputDecimal() {
+                // Prevent extremely long inputs
+                if (currentInput.length >= 12 && !resetInput) {
+                    return;
+                }
+                
+                if (resetInput) {
+                    currentInput = '0.';
+                    resetInput = false;
+                } else if (!currentInput.includes('.')) {
+                    currentInput += '.';
+                }
+                updateDisplay();
+            }
+            
+            // Handle operations
+            function handleOperation(operator) {
+                const inputValue = parseFloat(currentInput);
+                
+                if (firstOperand === null) {
+                    firstOperand = inputValue;
+                    operationString = `${formatNumber(inputValue)} ${operator}`;
+                } else if (pendingOperation) {
+                    try {
+                        const result = calculate(firstOperand, inputValue, pendingOperation);
+                        const fullOperation = `${operationString} ${formatNumber(inputValue)}`;
+                        
+                        // Format the result for display
+                        currentInput = formatNumber(result);
+                        firstOperand = result;
+                        operationString = `${formatNumber(result)} ${operator}`;
+                        
+                        addToHistory(fullOperation, formatNumber(result));
+                        updateDisplay();
+                    } catch (error) {
+                        showError(error.message);
+                        clear();
+                        return;
+                    }
+                }
+                
+                resetInput = true;
+                pendingOperation = operator;
+                updateOperationDisplay();
+            }
+            
+            // Format number for display
+            function formatNumber(number) {
+                // Convert to string and handle potential floating point issues
+                let numStr = String(Number(parseFloat(number).toFixed(10)));
+                
+                // Remove trailing zeros after decimal point
+                if (numStr.includes('.')) {
+                    numStr = numStr.replace(/\.?0+$/, '');
+                }
+                
+                return numStr;
+            }
+            
+            // Calculate result
+            function calculate(first, second, operation) {
+                let result;
+                
+                switch (operation) {
+                    case '+':
+                        result = first + second;
+                        break;
+                    case '-':
+                        result = first - second;
+                        break;
+                    case '×':
+                        result = first * second;
+                        break;
+                    case '÷':
+                        if (second === 0) {
+                            throw new Error("Cannot divide by zero");
+                        }
+                        result = first / second;
+                        break;
+                    case '%':
+                        if (second === 0) {
+                            throw new Error("Cannot divide by zero");
+                        }
+                        result = first % second;
+                        break;
+                    default:
+                        result = second;
+                }
+                
+                // Check for NaN or Infinity
+                if (!isFinite(result)) {
+                    throw new Error("Invalid calculation");
+                }
+                
+                return result;
+            }
+            
+            // Handle equals button
+            function handleEquals() {
+                const inputValue = parseFloat(currentInput);
+                
+                if (pendingOperation && firstOperand !== null) {
+                    try {
+                        const result = calculate(firstOperand, inputValue, pendingOperation);
+                        const fullOperation = `${operationString} ${formatNumber(inputValue)} =`;
+                        
+                        currentInput = formatNumber(result);
+                        addToHistory(fullOperation, formatNumber(result));
+                        
+                        firstOperand = null;
+                        pendingOperation = null;
+                        operationString = '';
+                        resetInput = true;
+                        
+                        updateDisplay();
+                        updateOperationDisplay();
+                    } catch (error) {
+                        showError(error.message);
+                        clear();
+                    }
+                }
+            }
+            
+            // Handle clear button
+            function clear() {
+                currentInput = '0';
+                firstOperand = null;
+                pendingOperation = null;
+                resetInput = false;
+                operationString = '';
+                
+                updateDisplay();
+                updateOperationDisplay();
+            }
+            
+            // Handle backspace button
+            function backspace() {
+                if (currentInput.length > 1) {
+                    currentInput = currentInput.slice(0, -1);
+                } else {
+                    currentInput = '0';
+                }
+                updateDisplay();
+            }
+            
+            // Set theme
+            function setTheme(theme) {
+                document.body.className = theme + '-theme';
+                
+                // Save theme preference
+                localStorage.setItem('calculatorTheme', theme);
+                
+                // Update active state on theme buttons
+                themeButtons.forEach(btn => {
+                    if (btn.dataset.theme === theme) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                });
+            }
+            
+            // Load saved theme
+            function loadTheme() {
+                const savedTheme = localStorage.getItem('calculatorTheme') || 'dark';
+                setTheme(savedTheme);
+            }
+            
+            // Add event listener for clear history button
+            clearHistoryBtn.addEventListener('click', clearHistory);
+            
+            // Add event listeners for all buttons
+            buttons.forEach(button => {
+                button.addEventListener('click', () => {
+                    if (button.classList.contains('number')) {
+                        inputNumber(button.textContent);
+                    } else if (button.classList.contains('decimal')) {
+                        inputDecimal();
+                    } else if (button.classList.contains('operator')) {
+                        handleOperation(button.textContent);
+                    } else if (button.classList.contains('equals')) {
+                        handleEquals();
+                    } else if (button.classList.contains('clear')) {
+                        clear();
+                    } else if (button.classList.contains('backspace')) {
+                        backspace();
+                    }
+                });
+            });
+            
+            // Add event listeners for theme buttons
+            themeButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    setTheme(button.dataset.theme);
+                });
+            });
+            
+            // Add keyboard support
+            document.addEventListener('keydown', (event) => {
+                const key = event.key;
+                
+                if (!isNaN(key) && key !== ' ') {
+                    event.preventDefault();
+                    inputNumber(key);
+                } else if (key === '.') {
+                    event.preventDefault();
+                    inputDecimal();
+                } else if (key === '+' || key === '-') {
+                    event.preventDefault();
+                    handleOperation(key);
+                } else if (key === '*') {
+                    event.preventDefault();
+                    handleOperation('×');
+                } else if (key === '/') {
+                    event.preventDefault();
+                    handleOperation('÷');
+                } else if (key === '%') {
+                    event.preventDefault();
+                    handleOperation('%');
+                } else if (key === 'Enter' || key === '=') {
+                    event.preventDefault();
+                    handleEquals();
+                } else if (key === 'Escape') {
+                    event.preventDefault();
+                    clear();
+                } else if (key === 'Backspace') {
+                    event.preventDefault();
+                    backspace();
+                }
+            });
+            
+            // Hide history panel if empty
+            if (historyPanel.children.length <= 1) {
+                historyPanel.style.display = 'none';
+            } else {
+                historyPanel.style.display = 'block';
+            }
+            
+            // Initialize display
+            updateDisplay();
+            updateOperationDisplay();
+        });
+    </script>
+</body>
+</html>
